@@ -1,0 +1,68 @@
+.button-container {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 1.875rem;
+}
+
+.bot-button.bot-stop {
+    width: 100%;
+    padding: 7px;
+    background-color: var(--primary-color);
+    background-image: conic-gradient(from 1turn, #6acf15, #209b44);
+    color: white;
+    border-radius: 2px;
+}
+
+.bot-button.bot-start {
+    width: 100%;
+    padding: 7px;
+    background-color: #17c128;
+    background-image: conic-gradient(from 1turn, #cf1515, #b11f77);
+    color: white;
+    border-radius: 2px;
+}
+
+.bot-button {
+    height: 3.625rem;
+}
+
+.reset-button {
+    padding: 0.5rem 0.9375rem;
+    background-color: #31343c;
+    border-radius: var(--border-radius);
+    color: var(--text-color);
+}
+
+.title-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* cursor: move; */
+    /* margin: 0 1.125rem 0.375rem; */
+}
+
+.dot {
+    height: 15px;
+    width: 15px;
+    background-color: #ff0000;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.dot.dot-blur {
+    background-color: #00ff00;
+}
+
+.details p {
+    font-size: medium;
+}
+
+.bot-ui .coin-icon {
+    margin-right: 0.3125rem;
+    width: 1.25rem;
+    height: 1.25rem;
+}
+
+.bot-ui input {
+    font-weight: 700;
+}

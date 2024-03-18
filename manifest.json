@@ -1,0 +1,62 @@
+{
+    "manifest_version": 3,
+    "name": "BC.Game bot",
+    "description": "scrape product details from QVC",
+    "version": "1.0.3",
+    "action": {
+        "default_icon": "dice-icon.png",
+        "default_popup": "popup.html"
+    },
+    "background": {
+        "service_worker": "background.js"
+    },
+    "permissions": [
+        "tabs",
+        "activeTab",
+        "storage",
+        "webNavigation",
+        "scripting",
+        "notifications",
+        "nativeMessaging"
+    ],
+    "externally_connectable": {
+        "ids": [
+            "aaaa",
+            "bbbb"
+        ]
+    },
+    "host_permissions": [
+        "https://bcgame.ai/",
+        "https://bc.co/",
+        "https://bcgame.ph/",
+        "https://bc.game/"
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "scripts/content.js",
+                "scripts/inject.js",
+                "scripts/injectCrash.js",
+                "scripts/content-classic.js",
+                "scripts/content-hash.js",
+                "scripts/content-limbo.js",
+                "scripts/content-wheel.js",
+                "scripts/content-crash.js",
+                "tfjsmodel/model.json",
+                "tfjsmodel/group1-shard1of1.bin",
+                "/tfjsmodel"
+            ],
+            "matches": [
+                "https://bcgame.ai/*",
+                "https://bc.co/*",
+                "https://bc.game/*"
+            ]
+        }
+    ],
+    "externally_connectable": {
+        "matches": [
+            "https://bcgame.ai/*",
+            "https://bc.co/*"
+        ]
+    }
+}
