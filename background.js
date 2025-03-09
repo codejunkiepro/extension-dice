@@ -7,9 +7,9 @@ class Extension {
         chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
             // console.log(changeInfo);
             if (
-                (tab.url.indexOf("https://bcgame.ai/game/crash") > -1 ||
-                    tab.url.indexOf("https://bc.game/game/crash") > -1 ||
-                    tab.url.indexOf("https://bcgame.ph/game/crash") >
+                (tab.url.indexOf("https://nanogames.io/hash-dice") > -1 ||
+                    tab.url.indexOf("https://nanogames.io/hash-dice") > -1 ||
+                    tab.url.indexOf("https://nanogames.io/hash-dice") >
                     -1) &&
                 changeInfo.url === undefined &&
                 changeInfo.status === "complete"
@@ -34,14 +34,14 @@ class Extension {
             }
         );
     }
-    
+
 
     injectCrashScripts(tab) {
         const inject = chrome.runtime.getURL("/scripts/injectCrash.js");
         const extensionId = chrome.runtime.id;
         chrome.scripting.executeScript({
-            target: { tabId: tab.id },
-            func: (inject) => {
+            target: { tabId: tab.id, },
+            func: (inject, extensionId) => {
                 if (!window.addBot) {
                     const el = document.createElement("script");
                     el.src = inject;

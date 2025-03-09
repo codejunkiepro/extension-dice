@@ -20,43 +20,31 @@
         "nativeMessaging"
     ],
     "externally_connectable": {
-        "ids": [
-            "aaaa",
-            "bbbb"
+        "matches": [
+            "https://bcgame.ai/*",
+            "https://bc.co/*",
+            "https://nanogames.io/*"
         ]
     },
     "host_permissions": [
         "https://bcgame.ai/",
         "https://bc.co/",
         "https://bcgame.ph/",
-        "https://bc.game/"
+        "https://bc.game/",
+        "https://nanogames.io/"
     ],
     "web_accessible_resources": [
         {
             "resources": [
-                "scripts/content.js",
-                "scripts/inject.js",
                 "scripts/injectCrash.js",
-                "scripts/content-classic.js",
-                "scripts/content-hash.js",
-                "scripts/content-limbo.js",
-                "scripts/content-wheel.js",
-                "scripts/content-crash.js",
-                "tfjsmodel/model.json",
-                "tfjsmodel/group1-shard1of1.bin",
-                "/tfjsmodel"
+                "scripts/content-crash.js"
             ],
             "matches": [
                 "https://bcgame.ai/*",
                 "https://bc.co/*",
-                "https://bc.game/*"
+                "https://bc.game/*",
+                "https://nanogames.io/*"
             ]
         }
-    ],
-    "externally_connectable": {
-        "matches": [
-            "https://bcgame.ai/*",
-            "https://bc.co/*"
-        ]
-    }
+    ]
 }

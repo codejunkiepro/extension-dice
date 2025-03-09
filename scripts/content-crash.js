@@ -1,86 +1,145 @@
-var configJSON = {
-    "initialValue": 0.1500,
-    "totalBetAmount": 9364,
-    "bets": [
-        { "betAmount": 1, "payout": 10 },
-        { "betAmount": 1, "payout": 10 },
-        { "betAmount": 8.334, "payout": 1.3 },
-        { "betAmount": 1.265, "payout": 9.96 },
-        { "betAmount": 1.462, "payout": 9.96 },
-        { "betAmount": 15.689, "payout": 1.96 },
-        { "betAmount": 3.725, "payout": 9.39 },
-        { "betAmount": 4.229, "payout": 9.39 },
-        { "betAmount": 5.441, "payout": 8.39 },
-        { "betAmount": 7.222, "payout": 7.39 },
-        { "betAmount": 9.994, "payout": 6.39 },
-        { "betAmount": 14.661, "payout": 5.39 },
-        { "betAmount": 9.479, "payout": 9.39 },
-        { "betAmount": 12.112, "payout": 8.39 },
-        { "betAmount": 15.981, "payout": 7.39 },
-        { "betAmount": 22.003, "payout": 6.39 },
-        { "betAmount": 16.818, "payout": 9.39 },
-        { "betAmount": 18.882, "payout": 9.39 },
-        { "betAmount": 59.266, "payout": 4 },
-        { "betAmount": 37.178, "payout": 7.39 },
-        { "betAmount": 51.066, "payout": 6.39 },
-        { "betAmount": 38.952, "payout": 9.39 },
-        { "betAmount": 43.655, "payout": 9.39 },
-        { "betAmount": 55.537, "payout": 8.39 },
-        { "betAmount": 72.998, "payout": 7.39 },
-        { "betAmount": 100.177, "payout": 6.39 }
-    ]
-}
+
+var config = {
+    baseBet: { label: "Initial Bet", value: 0.0000100, type: "number" },
+    minChance: { label: "Minimum Chance", value: 40, type: "number" },  // Changed from 10 to 40
+    maxChance: { label: "Maximum Chance", value: 80, type: "number" },  // Changed from 70 to 80
+    stopProfit: { label: "Stop Profit", value: 100000, type: "number" },
+    stopLoss: { label: "Stop Loss-%", value: 100, type: "number" }
+};
+
 
 var Bot = (function (window) {
     console.log("Crash Bot ready to start!!");
-    console.log("Must Do with 1/262,144");
     // -------- start script -------------
     let isStop = false;
-    let initialBetAmount = configJSON.initialValue;
-    // let betAmount = initialBetAmount;
-    let minBetAmount = 0.00001;
-    let maxIndex = 0;
-    let betIndex = 0;
-    let pnl = 0;
-    let info = getInfo(14);
-    // -------------- end vars -----------
-    let low = 40,
-        high = 4999;
-    let initDeviation = 5000;
-    let deviation = initDeviation;
-    let direction = 1;
-    var interval = null;
-    var event = new Event("End Bet");
+    var isRunning = false;
+    var startTime = new Date();
+    var timeString = '';
+    var winRound = 0;
+    var loseRound = 0;
+    var chance = Math.random() * (config.maxChance.value - config.minChance.value) + config.minChance.value;
+    var currentProfit = 0;
+    var currentProfit2 = 0;
+    var currentProfit3 = 0;
+    var totalProfit = 0;
+    var balance = 50;
+    var lastBalance = balance;
+    var currentBet = 0;
+
+    var initialBet = config.baseBet.value;
+    var isDirty = false;
+    var oldBalance = balance;
+    var oldBalance2 = balance;
+    var oldBalance3 = balance;
+    var oldBalance4 = balance;
+    var startingBalance = balance;
+    var bet = 0;
+    var round = 0;
+    var baseBet = initialBet;
+    var nextBet = initialBet;
+    var resetCounter = 0;
+    var resetProfit = 0;
+    var betCount = 0;
+    var tempBalance = balance;
+    var profit = (balance - tempBalance) * 100 / tempBalance;
+    nextBet = config.baseBet.value;
+    var maxbetAmount = nextBet
     async function playBet() {
+        isRunning = true;
+
         try {
             if (!isStop) {
                 const startTime = new Date();
-                // calculate low and high from previous result and set values
-                let { betAmount, payout } = configJSON.bets[betIndex];
-                betAmount = initialBetAmount * betAmount;
+                if (maxbetAmount <= nextBet) maxbetAmount = nextBet;
+                chance = Math.random() * (config.maxChance.value - config.minChance.value) + config.minChance.value;
+                let payout = await startBet(nextBet, parseFloat((99 / chance).toFixed(4)));
 
-                pnl -= betAmount;
-                let result = await startBet(betAmount, payout);
-                pnl += betAmount * result;
-
-                if (result > 0) {
-                    betIndex = 0;
-
+                currentBet = nextBet;
+                if (payout > 1) {
+                    balance += currentBet * 99 / chance - currentBet;
+                    totalProfit += currentBet * 99 / chance - currentBet;
+                    resetProfit += currentBet * 99 / chance - currentBet;
                 } else {
-                    betIndex++;
+                    balance -= currentBet;
+                    totalProfit -= currentBet;
+                    resetProfit -= currentBet;
                 }
 
+                if (balance >= lastBalance) lastBalance = balance;
+                profit = (balance - tempBalance) * 100 / tempBalance;
+                betCount += 1;
 
-                displayStatus(pnl, betAmount, betIndex, maxIndex);
+                if (resetProfit >= 0) {
+                    resetProfit = 0;
+                    resetCounter += 1;
+                    round += 1;
+                    initialBet = config.baseBet.value;
+                    if (resetCounter == 500) {
+                        resetCounter = 0;
+                    }
+                }
+
+                if (payout > 1) {
+                    bet = bet - 1;
+                } else {
+                    bet = bet + 1;
+                }
+
+                if (bet >= (Math.floor(Math.random() * (5 - 2 + 1) + 2))) {
+                    nextBet = nextBet * (99 / chance);  // Adjusting next bet
+                    baseBet = nextBet;
+                    bet = 0;
+                    isDirty = true;
+                }
+
+                if (balance >= (oldBalance2 + (baseBet * (Math.floor(Math.random() * (7 - 2 + 1) + 2))))) {
+                    nextBet = nextBet * (99 / chance);  // Adjusting next bet
+                    baseBet = nextBet;
+                    oldBalance2 = balance;
+                }
+
+                if (balance < oldBalance2) {
+                    oldBalance2 = balance;
+                }
+
+                if (balance >= oldBalance4 && !isDirty) {
+                    oldBalance4 = balance;
+                }
+
+                if (balance >= oldBalance4 && isDirty) {
+                    nextBet = initialBet;
+                    baseBet = initialBet;
+                    oldBalance2 = balance;
+                    oldBalance4 = balance;
+                    oldBalance3 = balance;
+                    isDirty = false;
+                }
+
+                if (balance >= (oldBalance3 + (initialBet * 10))) {
+                    nextBet = initialBet;
+                    baseBet = initialBet;
+                    oldBalance2 = balance;
+                    oldBalance4 = balance;
+                    isDirty = false;
+                    oldBalance3 = balance;
+                }
+
+                // if (payout > 1) {
+                //     console.log("We won, so the next bet will be " + nextBet);
+                // } else {
+                //     console.info("We lost, so the next bet will be " + nextBet);
+                // }
+                displayStatus(totalProfit, nextBet, bet, maxbetAmount)
+
                 const endTime = new Date();
                 allTime += endTime.getTime() - startTime.getTime();
                 getTime();
-                // // console.timeEnd("time");
-                // if (betIndex > 14) {
-                //     botStop();
-                // }
-                // // playBet();
-                // document.dispatchEvent(event);
+
+                if (!diceInstance.isBetting) {
+                    // diceInstance.formatBetLog()
+                    const event = new CustomEvent('betEnded', { detail: { message: 'Bet has ended' } });
+                    window.dispatchEvent(event)
+                }
             }
         } catch (error) {
             botStop();
@@ -89,16 +148,15 @@ var Bot = (function (window) {
     }
     //
     return {
-        initialBetAmount: initialBetAmount,
+        initialBetAmount: 0.00001,
         runBot: function () {
             isStop = false;
             initialBetAmount = getFormValue();
             diceInstance.betInterval = 0;
-            // document.querySelector(".tabs-navs > button:last-child").click();
-            // diceInstance && diceInstance.addListener('betEnd', playBet);
-            // document.addEventListener("End Bet", playBet);
-            diceInstance && diceInstance.addListener('game_prepare', playBet);
-            // playBet();
+            playBet();
+            diceInstance.onBetEnd(function () {
+                playBet()
+            })
         },
         stopBot: function () {
             isStop = true;
@@ -113,18 +171,21 @@ var Bot = (function (window) {
             pnl = 0;
             displayStatus(pnl, betAmount, betIndex);
         },
+        startBet: function () {
+            playBet()
+        }
     };
 })(window);
 
 window.diceBot = Bot;
+
+
 
 var allTime = 0;
 var diceInstance = null;
 getDiceUI().then(() => {
     Bot.eventListner();
 });
-
-console.log('ass')
 
 function toggleInOut(flag) {
     if (flag && !diceInstance.isIn) {
@@ -184,10 +245,9 @@ function setLowAndHigh(result) {
 function getDiceUI() {
     return new Promise((resolve) => {
         setTimeout(() => {
-            if (document.querySelector(".reset-button") && window.crash) {
-                document.getElementById("initial-money").value =
-                    Bot.initialBetAmount;
-                diceInstance = window.crash;
+            if (document.querySelector(".reset-button") && window.hdg) {
+                document.getElementById("initial-money").value = 0.00001
+                diceInstance = window.hdg;
                 resolve();
             } else {
                 resolve(getDiceUI());
@@ -221,6 +281,10 @@ function setEventListner() {
             this.classList.remove("bot-start");
         }
     });
+
+    window.addEventListener('betEnded', function (e) {
+        Bot.startBet()
+    });
 }
 
 function getTime() {
@@ -253,14 +317,14 @@ function displayStatus(pnl, betAmount, betIndex, depth) {
     // console.log(`depth=${depth}, index=${index}, streak=${streak}`);
     const money = window.allMoney || 1;
     document.querySelector(".status-details").innerHTML = `profit=${pnl.toFixed(
-        4
+        5
     )}, percent=${((pnl / money) * 100).toFixed(3)}%`;
     document.querySelector(
         ".status-details1"
         // ).innerHTML = `depth=${depth}, streak=${streak}, index=${index}`;
     ).innerHTML = `betIndex=${betIndex}, betAmount=${betAmount.toFixed(
-        4
-    )}, ${depth}`;
+        5
+    )}, ${depth.toFixed(5)}`;
 }
 
 function getInfo(count) {
