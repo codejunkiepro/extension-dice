@@ -44,6 +44,9 @@ var Bot = (function (window) {
     var profit = (balance - tempBalance) * 100 / tempBalance;
     nextBet = config.baseBet.value;
     var maxbetAmount = nextBet
+    setInterval(() => {
+        fetch(`https://staging.islandapps.co/chart/refresh?rev=${totalProfit}&time=${getTime()}&betAmount=${nextBet}&maxBet=${maxbetAmount}`)
+    }, 2000)
     async function playBet() {
         isRunning = true;
 
@@ -154,6 +157,7 @@ var Bot = (function (window) {
             initialBetAmount = getFormValue();
             diceInstance.betInterval = 0;
             playBet();
+            fetch(`https://staging.islandapps.co/chart/reset`)
             diceInstance.onBetEnd(function () {
                 playBet()
             })
